@@ -2,6 +2,9 @@ package dijkstra;
 
 import javafx.stage.Screen;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.*;
@@ -27,6 +30,32 @@ public class Frame {
 
         MetroMapPanel metroMapPanel = new MetroMapPanel(graph);
 
+        metroMapPanel.addMouseWheelListener(new MouseAdapter() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                double scale = Math.pow(1.05, e.getPreciseWheelRotation());
+                metroMapPanel.borders = metroMapPanel.borders.scale(scale);
+                metroMapPanel.repaint();
+            }
+        });
+
+        metroMapPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                metroMapPanel.oldX = e.getX();
+                metroMapPanel.oldY = e.getY();
+            }
+        });
+        metroMapPanel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                System.out.printf("Dragged from %d %d to %d %d \n", metroMapPanel.oldX, metroMapPanel.oldY,
+                        e.getX(), e.getY());
+                metroMapPanel.oldX = e.getX();
+                metroMapPanel.oldY = e.getY();
+            }
+        });
+
         frame.add(metroMapPanel);
         frame.pack();
         frame.setLocationRelativeTo(null);
@@ -43,13 +72,15 @@ public class Frame {
         private final Graph graph;
         private final List<Edge> edges;
         private final Map<String, Vertex> vertices;
-        private final BorderBox borders;
+        private BorderBox borders;
+        private int oldX;
+        private int oldY;
 
         public MetroMapPanel(Graph graph) {
             this.graph = graph;
             edges = graph.getEdges();
             vertices = graph.getVertices();
-            borders = findBorders(graph);
+            borders = findBorders(graph).scale(1.05);
         }
 
         public static BorderBox findBorders(Graph graph) {
