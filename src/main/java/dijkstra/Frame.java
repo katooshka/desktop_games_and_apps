@@ -1,17 +1,11 @@
 package dijkstra;
 
-import javafx.stage.Screen;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
-import java.util.List;
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
-
-import static java.lang.Math.*;
 
 /**
  * Author: katooshka
@@ -33,26 +27,25 @@ public class Frame {
         metroMapPanel.addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                double scale = Math.pow(1.05, e.getPreciseWheelRotation());
-                metroMapPanel.borders = metroMapPanel.borders.scale(scale);
-                metroMapPanel.repaint();
+                metroMapPanel.onMouseWheelMoved(e.getPreciseWheelRotation());
             }
         });
-
         metroMapPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                metroMapPanel.oldX = e.getX();
-                metroMapPanel.oldY = e.getY();
+                metroMapPanel.onMousePressed(e.getX(), e.getY());
             }
         });
         metroMapPanel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                System.out.printf("Dragged from %d %d to %d %d \n", metroMapPanel.oldX, metroMapPanel.oldY,
-                        e.getX(), e.getY());
-                metroMapPanel.oldX = e.getX();
-                metroMapPanel.oldY = e.getY();
+                metroMapPanel.onMouseDragged(e.getX(), e.getY());
+            }
+        });
+        metroMapPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                metroMapPanel.onMouseClicked(e.getX(), e.getY());
             }
         });
 
@@ -61,84 +54,6 @@ public class Frame {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-    }
-
-    public static class MetroMapPanel extends JPanel {
-        private static final int STATION_HEIGHT = 10;
-        private static final int STATION_WIDTH = 10;
-        private static final int LINE_WIDTH = 6;
-        private static final int STATION_BORDER = 3;
-        private final Graph graph;
-        private final List<Edge> edges;
-        private final Map<String, Vertex> vertices;
-        private BorderBox borders;
-        private int oldX;
-        private int oldY;
-
-        public MetroMapPanel(Graph graph) {
-            this.graph = graph;
-            edges = graph.getEdges();
-            vertices = graph.getVertices();
-            borders = findBorders(graph).scale(1.05);
-        }
-
-        public static BorderBox findBorders(Graph graph) {
-            int top = 0;
-            int bottom = 0;
-            int left = 0;
-            int right = 0;
-            boolean first = true;
-            for (Vertex value : graph.getVertices().values()){
-                int x = value.getCoordinate().getX();
-                int y = value.getCoordinate().getY();
-                if (first) {
-                    first = false;
-                    top = y;
-                    bottom = y;
-                    left = x;
-                    right = x;
-                    continue;
-                }
-                top = min(top, y);
-                bottom = max(bottom, y);
-                left = min(left, x);
-                right = max(right, x);
-            }
-            return new BorderBox(top, bottom, left, right);
-
-        }
-
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D gr = (Graphics2D) g;
-            gr.setStroke(new BasicStroke(LINE_WIDTH));
-            for (Edge edge : edges) {
-                Coordinate firstCoordinate = borders.transformCoordinate(graph.getStartCoordinate(edge), getWidth(), getHeight());
-                Coordinate secondCoordinate = borders.transformCoordinate(graph.getEndCoordinate(edge), getWidth(), getHeight());
-                gr.drawLine(firstCoordinate.getX(), firstCoordinate.getY(), secondCoordinate.getX(), secondCoordinate.getY());
-            }
-            gr.setStroke(new BasicStroke(STATION_BORDER));
-            for (String vertexName : vertices.keySet()) {
-                Vertex vertex = vertices.get(vertexName);
-                gr.setColor(awtColor(vertex.getStationColor()));
-                Coordinate coordinate = borders.transformCoordinate(vertex.getCoordinate(), getWidth(), getHeight());
-                g.fillOval(coordinate.getX() - STATION_WIDTH / 2,
-                        coordinate.getY() - STATION_HEIGHT / 2,
-                        STATION_WIDTH,
-                        STATION_HEIGHT);
-                gr.setColor(Color.BLACK);
-                g.drawOval(coordinate.getX() - STATION_WIDTH / 2,
-                        coordinate.getY() - STATION_HEIGHT / 2,
-                        STATION_WIDTH,
-                        STATION_HEIGHT);
-            }
-        }
-
-        private static Color awtColor(GraphColor color) {
-            return new Color(color.getRed(), color.getGreen(), color.getBlue());
-        }
     }
 
 }

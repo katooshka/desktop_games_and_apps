@@ -17,21 +17,43 @@ public class BorderBox {
         this.right = right;
     }
 
-    public Coordinate transformCoordinate(Coordinate initialCoordinate, int width, int height) {
-        int x = (int) Math.round(width * (initialCoordinate.getX() - left) / (right - left));
-        int y = (int) Math.round(height * (initialCoordinate.getY() - top) / (bottom - top));
-        return new Coordinate(x, y);
+    public double getTop() {
+        return top;
+    }
+
+    public double getBottom() {
+        return bottom;
+    }
+
+    public double getLeft() {
+        return left;
+    }
+
+    public double getRight() {
+        return right;
+    }
+
+    public double getWidth() {
+        return right - left;
+    }
+
+    public double getHeight() {
+        return bottom - top;
+    }
+
+    public PixelCoordinate transformCoordinate(Coordinate initialCoordinate, int width, int height) {
+        int x = (int) Math.round(width * (initialCoordinate.getX() - left) / getWidth());
+        int y = (int) Math.round(height * (initialCoordinate.getY() - top) / getHeight());
+        return new PixelCoordinate(x, y);
     }
 
     public BorderBox scale(double mul) {
         double centerY = (bottom + top) / 2;
         double centerX = (right + left) / 2;
-        double height = bottom - top;
-        double width = right - left;
-        double newTop = centerY - (height / 2) * mul;
-        double newBottom = centerY + (height / 2) * mul;
-        double newLeft = centerX - (width / 2) * mul;
-        double newRight = centerX + (width / 2) * mul;
+        double newTop = centerY - (getHeight() / 2) * mul;
+        double newBottom = centerY + (getHeight() / 2) * mul;
+        double newLeft = centerX - (getWidth() / 2) * mul;
+        double newRight = centerX + (getWidth() / 2) * mul;
         return new BorderBox(newTop, newBottom, newLeft, newRight);
     }
 
