@@ -28,7 +28,8 @@ public class MetroMapPanel extends JPanel {
     private BorderBox borders;
     private int oldX;
     private int oldY;
-    private String stationToMark = null;
+    private String stationTo = null;
+    private String stationFrom = null;
 
     public MetroMapPanel(Graph graph) {
         this.graph = graph;
@@ -55,8 +56,11 @@ public class MetroMapPanel extends JPanel {
         for (String vertexName : vertices.keySet()) {
             drawStation(gr, vertexName, STATION_SIZE);
         }
-        if (stationToMark != null) {
-            drawStation(gr, stationToMark, MARKED_STATION_SIZE);
+        if (stationTo != null) {
+            drawStation(gr, stationTo, MARKED_STATION_SIZE);
+        }
+        if (stationFrom != null) {
+            drawStation(gr, stationFrom, MARKED_STATION_SIZE);
         }
     }
 
@@ -81,7 +85,12 @@ public class MetroMapPanel extends JPanel {
     }
 
     public void onMouseClicked(int x, int y) {
-        this.stationToMark = getNearestStation(x, y, graph);
+        if ((stationTo == null && stationFrom == null) || (stationTo != null && stationFrom != null)) {
+            stationFrom = getNearestStation(x, y, graph);
+            stationTo = null;
+        } else {
+            stationTo = getNearestStation(x, y, graph);
+        }
         repaint();
     }
 
