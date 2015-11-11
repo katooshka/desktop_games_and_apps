@@ -2,13 +2,14 @@ package dijkstra;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import static java.awt.Color.BLACK;
 import static java.lang.Double.POSITIVE_INFINITY;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.util.Arrays.asList;
 
 /**
  * Author: katooshka
@@ -28,8 +29,9 @@ public class MetroMapPanel extends JPanel {
     private BorderBox borders;
     private int oldX;
     private int oldY;
-    private String stationTo = null;
-    private String stationFrom = null;
+    public String stationFrom = null;
+    public String stationTo = null;
+    private List<String> way = null;
 
     public MetroMapPanel(Graph graph) {
         this.graph = graph;
@@ -56,11 +58,14 @@ public class MetroMapPanel extends JPanel {
         for (String vertexName : vertices.keySet()) {
             drawStation(gr, vertexName, STATION_SIZE);
         }
-        if (stationTo != null) {
-            drawStation(gr, stationTo, MARKED_STATION_SIZE);
+        if (way != null) {
+            drawWay(gr);
         }
         if (stationFrom != null) {
             drawStation(gr, stationFrom, MARKED_STATION_SIZE);
+        }
+        if (stationTo != null) {
+            drawStation(gr, stationTo, MARKED_STATION_SIZE);
         }
     }
 
@@ -76,8 +81,8 @@ public class MetroMapPanel extends JPanel {
     }
 
     public void onMouseDragged(int x, int y) {
-        double dx = - (x - oldX) * borders.getWidth() / getWidth();
-        double dy = - (y - oldY) * borders.getHeight() / getHeight();
+        double dx = -(x - oldX) * borders.getWidth() / getWidth();
+        double dy = -(y - oldY) * borders.getHeight() / getHeight();
         borders = borders.move(dx, dy);
         repaint();
         oldX = x;
@@ -88,8 +93,10 @@ public class MetroMapPanel extends JPanel {
         if ((stationTo == null && stationFrom == null) || (stationTo != null && stationFrom != null)) {
             stationFrom = getNearestStation(x, y, graph);
             stationTo = null;
+            way = null;
         } else {
             stationTo = getNearestStation(x, y, graph);
+            way = graph.findShortestWay(stationTo, stationFrom);
         }
         repaint();
     }
@@ -140,6 +147,12 @@ public class MetroMapPanel extends JPanel {
         Vertex vertex = vertices.get(vertexName);
         PixelCoordinate coordinate = borders.transformCoordinate(vertex.getCoordinate(), getWidth(), getHeight());
         paintCircle(gr, stationSize, coordinate, awtColor(vertex.getStationColor()));
+    }
+
+    public void drawWay(Graphics2D gr) {
+        for (String station : way) {
+            drawStation(gr, station, MARKED_STATION_SIZE);
+        }
     }
 
 

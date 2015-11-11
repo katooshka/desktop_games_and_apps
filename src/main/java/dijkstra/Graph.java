@@ -3,6 +3,8 @@ package dijkstra;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Arrays.asList;
+
 /**
  * Author: katooshka
  * Date: 11/2/15.
@@ -30,5 +32,13 @@ public class Graph {
 
     public Coordinate getEndCoordinate(Edge edge) {
         return vertices.get(edge.getSecondStation()).getCoordinate();
+    }
+
+    public List<String> findShortestWay(String stationFrom, String stationTo) {
+        return asList("Калужско-Рижская:Медведково",
+                "Калужско-Рижская:Бабушкинская",
+                "Калужско-Рижская:Свиблово",
+                "Калужско-Рижская:Ботанический сад",
+                "Калужско-Рижская:ВДНХ");
     }
 }
