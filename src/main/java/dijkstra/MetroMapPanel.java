@@ -96,7 +96,7 @@ public class MetroMapPanel extends JPanel {
             way = null;
         } else {
             stationTo = getNearestStation(x, y, graph);
-            way = graph.findShortestWay(stationTo, stationFrom);
+            way = graph.findShortestWay(stationFrom, stationTo);
         }
         repaint();
     }
@@ -154,7 +154,6 @@ public class MetroMapPanel extends JPanel {
             drawStation(gr, station, MARKED_STATION_SIZE);
         }
     }
-
 
     private void paintCircle(Graphics2D gr, int diameter, PixelCoordinate pixel, Color color) {
         gr.setColor(color);
