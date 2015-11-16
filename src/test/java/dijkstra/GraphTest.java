@@ -3,10 +3,7 @@ package dijkstra;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -42,6 +39,9 @@ public class GraphTest {
         assertEquals(4, graph.getWay("B", "C"));
         assertEquals(7, graph.getWay("A", "C"));
         assertEquals(7, graph.getWay("C", "A"));
+
+        assertEquals(asList("B", "A"), graph.findShortestWay("B", "A"));
+        assertEquals(asList("A", "B", "C"), graph.findShortestWay("A", "C"));
     }
 
 }

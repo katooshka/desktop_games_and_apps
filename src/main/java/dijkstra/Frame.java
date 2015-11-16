@@ -5,6 +5,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,10 +41,19 @@ public class Frame {
         JTextArea stationFromText = new JTextArea();
         JTextArea stationToText = new JTextArea();
         JTextArea time = new JTextArea();
+
+        stationFromText.setEditable(false);
+        stationToText.setEditable(false);
         time.setEditable(false);
+
+        stationFromText.setBackground(metroMapPanel.getBackground());
+        stationToText.setBackground(metroMapPanel.getBackground());
+        time.setBackground(metroMapPanel.getBackground());
+
         setTextAreaBorders(stationFromText, "Начальная станция");
         setTextAreaBorders(stationToText, "Конечная станция");
         setTextAreaBorders(time, "Время в пути");
+
         wayInfo.add(stationFromText);
         wayInfo.add(stationToText);
         wayInfo.add(time);
@@ -70,56 +82,13 @@ public class Frame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 metroMapPanel.onMouseClicked(e.getX(), e.getY());
-            }
-        });
-        stationFromText.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                if (graph.getVertices().containsKey(stationFromText.getText())) {
-                    metroMapPanel.stationFrom = stationFromText.getText();
-                    metroMapPanel.repaint();
-                }
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if (graph.getVertices().containsKey(stationFromText.getText())) {
-                    metroMapPanel.stationFrom = stationFromText.getText();
-                    metroMapPanel.repaint();
-                }
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                if (graph.getVertices().containsKey(stationFromText.getText())) {
-                    metroMapPanel.stationFrom = stationFromText.getText();
-                    metroMapPanel.repaint();
-                }
-            }
-        });
-
-        stationToText.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                if (graph.getVertices().containsKey(stationToText.getText())) {
-                    metroMapPanel.stationTo = stationToText.getText();
-                    metroMapPanel.repaint();
-                }
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if (graph.getVertices().containsKey(stationToText.getText())) {
-                    metroMapPanel.stationTo = stationToText.getText();
-                    metroMapPanel.repaint();
-                }
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                if (graph.getVertices().containsKey(stationToText.getText())) {
-                    metroMapPanel.stationTo = stationFromText.getText();
-                    metroMapPanel.repaint();
+                stationFromText.setText(metroMapPanel.stationFrom.split(":")[1]);
+                if (metroMapPanel.stationTo != null) {
+                    stationToText.setText(metroMapPanel.stationTo.split(":")[1]);
+                    time.setText(String.valueOf(graph.getMinWayLength() / 60));
+                } else {
+                    stationToText.setText("");
+                    time.setText("");
                 }
             }
         });

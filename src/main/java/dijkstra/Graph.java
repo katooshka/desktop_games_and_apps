@@ -2,8 +2,6 @@ package dijkstra;
 
 import java.util.*;
 
-import static java.util.Arrays.asList;
-
 /**
  * Author: katooshka
  * Date: 11/2/15.
@@ -11,6 +9,7 @@ import static java.util.Arrays.asList;
 public class Graph {
     private List<Edge> edges;
     private Map<String, Vertex> vertices;
+    private int minWayLength;
 
     public Graph(List<Edge> edges, Map<String, Vertex> vertices) {
         this.edges = edges;
@@ -33,10 +32,10 @@ public class Graph {
         return vertices.get(edge.getSecondStation()).getCoordinate();
     }
 
-    public List<String> findShortestWay(String stationFrom, String stationTo) {
-        System.out.println(getWay(stationFrom, stationTo));
-        System.out.println(getStations(stationFrom, stationTo));
-        return getStations(stationFrom, stationTo);
+    public ShortestWay findShortestWay(String stationFrom, String stationTo) {
+        ShortestWay way = getWay(stationFrom, stationTo);
+        minWayLength = way.getWayLength();
+        return way;
     }
 
     public List<Edge> getVertexEdges(String vertex) {
@@ -55,8 +54,8 @@ public class Graph {
     List<Edge> currentQueue = new ArrayList<>();
     Map<String, String> parentStations = new HashMap<>();
 
-    public int getWay(String stationFrom, String stationTo) {
-        clear();
+    public ShortestWay getWay(String stationFrom, String stationTo) {
+        clearVariables();
         setInitialDistances(stationFrom);
         while (!visitedStations.contains(stationTo)) {
             String currentStation = getNextVertex();
@@ -70,16 +69,15 @@ public class Graph {
             finalDistance.put(currentStation, currentMinimalDistance.get(currentStation));
             currentMinimalDistance.remove(currentStation);
         }
-        return finalDistance.get(stationTo);
+        return new ShortestWay(getStations(stationFrom, stationTo), finalDistance.get(stationTo));
     }
 
-    private void clear() {
+    private void clearVariables() {
         currentMinimalDistance.clear();
         finalDistance.clear();
         visitedStations.clear();
         parentStations.clear();
     }
-
 
     private String getNextVertex() {
         String minDistanceStation = currentMinimalDistance.entrySet().iterator().next().getKey();
@@ -127,9 +125,7 @@ public class Graph {
         }
     }
 
-    //Зависает: Китай-город (оранжевая) - Шаболовская
-
-    private List<String> getStations(String stationFrom, String stationTo) { //искать кратчайший(!) путь
+    private List<String> getStations(String stationFrom, String stationTo) {
         List<String> way = new ArrayList<>();
         way.add(stationTo);
         String currentStation = stationTo;
@@ -137,6 +133,11 @@ public class Graph {
             way.add(parentStations.get(currentStation));
             currentStation = parentStations.get(currentStation);
         }
+        Collections.reverse(way);
         return way;
+    }
+
+    public int getMinWayLength() {
+        return minWayLength;
     }
 }

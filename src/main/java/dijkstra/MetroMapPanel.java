@@ -31,7 +31,7 @@ public class MetroMapPanel extends JPanel {
     private int oldY;
     public String stationFrom = null;
     public String stationTo = null;
-    private List<String> way = null;
+    private ShortestWay way = null;
 
     public MetroMapPanel(Graph graph) {
         this.graph = graph;
@@ -63,6 +63,7 @@ public class MetroMapPanel extends JPanel {
         }
         if (stationFrom != null) {
             drawStation(gr, stationFrom, MARKED_STATION_SIZE);
+
         }
         if (stationTo != null) {
             drawStation(gr, stationTo, MARKED_STATION_SIZE);
@@ -150,7 +151,7 @@ public class MetroMapPanel extends JPanel {
     }
 
     public void drawWay(Graphics2D gr) {
-        for (String station : way) {
+        for (String station : way.getStations()) {
             drawStation(gr, station, MARKED_STATION_SIZE);
         }
     }
