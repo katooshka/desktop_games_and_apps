@@ -10,9 +10,13 @@ public class Field {
     private int size;
     private boolean[][] cells;
 
-    public Field(int size, int densityPercentage) {
+    public Field(int size, boolean[][] cells) {
         this.size = size;
-        cells = getFirstCellsGeneration(size, densityPercentage);
+        this.cells = cells;
+    }
+
+    public static Field createField(int size, int densityPercentage) {
+        return new Field(size, getFirstCellsGeneration(size, densityPercentage));
     }
 
     private static boolean[][] getFirstCellsGeneration(int size, int densityPercentage) {
@@ -32,46 +36,25 @@ public class Field {
         boolean[][] newCellsGeneration = new boolean[size][size];
         for (int i = 0; i < newCellsGeneration.length; i++) {
             for (int j = 0; j < newCellsGeneration.length; j++) {
+                int aliveCells = checkAliveCells(i, j);
                 if (cells[i][j]) {
-                    newCellsGeneration[i][j] = checkAliveCells(cells, i, j) == 2 || checkAliveCells(cells, i, j) == 3;
+                    newCellsGeneration[i][j] = aliveCells == 2 || aliveCells == 3;
                 } else {
-                    if (checkAliveCells(cells, i, j) == 3) {
-                        newCellsGeneration[i][j] = true;
-                    }
+                    newCellsGeneration[i][j] = aliveCells == 3;
                 }
             }
         }
         cells = newCellsGeneration;
     }
 
-    private int checkAliveCells(boolean[][] cells, int x, int y) {
-        boolean[][] newField = createFieldFrame(cells);
-        int aliveCellsNumber = 0;
-        boolean[] neighbourCells = {
-                newField[x][y],
-                newField[x][y + 1],
-                newField[x][y + 2],
-                newField[x + 1][y],
-                newField[x + 1][y + 2],
-                newField[x + 2][y],
-                newField[x + 2][y + 1],
-                newField[x + 2][y + 2]};
-        for (boolean neighbourCell : neighbourCells) {
-            if (neighbourCell) {
-                aliveCellsNumber += 1;
-            }
-        }
-        return aliveCellsNumber;
+    private int checkAliveCells(int x, int y) {
+        return cellAt(x - 1, y - 1) + cellAt(x - 1, y) + cellAt(x - 1, y + 1) +
+                cellAt(x, y - 1) + cellAt(x, y + 1) +
+                cellAt(x + 1, y - 1) + cellAt(x + 1, y) + cellAt(x + 1, y + 1);
     }
 
-    private boolean[][] createFieldFrame (boolean[][] cells) {
-        boolean[][] framedCells = new boolean[cells.length + 2][cells.length + 2];
-        for (int i = 1; i < framedCells.length - 1; i++) {
-            for (int j = 1; j < framedCells.length - 1; j++) {
-                framedCells[i][j] = cells[i - 1][j - 1];
-            }
-        }
-        return framedCells;
+    private int cellAt(int x, int y) {
+        return (x >= 0 && y >= 0 && x < size && y < size && cells[x][y]) ? 1 : 0;
     }
 
     public boolean[][] getCells() {

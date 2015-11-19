@@ -2,6 +2,8 @@ package game_of_life;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Author: katooshka
@@ -9,37 +11,49 @@ import java.awt.*;
  */
 
 public class GameOfLife {
-    //TODO: SwingUtilities.invokeLater() после всего остального
-    //TODO: убрать 20000
     //TODO: сделать тест
 
-
-    private static final int FIELD_SIZE = 700;
-    private static final int CELL_SIZE = 10;
+    private static final int CELL_SIZE = 7;
+    private static final int CELL_COUNT = 100;
+    private static final int FIELD_SIZE = CELL_SIZE * CELL_COUNT;
     private static final int CELLS_DENSITY_PERCENTAGE = 30;
-    private static final Color CELL_COLOR = Color.ORANGE;
-    private static Field field = new Field(FIELD_SIZE / CELL_SIZE, CELLS_DENSITY_PERCENTAGE);
+    private static final Color CELL_COLOR = new Color(86, 170, 138);
+    private static Field field = Field.createField(CELL_COUNT, CELLS_DENSITY_PERCENTAGE);
+    private static volatile boolean stopped = false;
+    private static JFrame frame = new JFrame();
+    private static GamePanel panel = new GamePanel();
 
     public static void main(String[] args) throws InterruptedException {
         drawFrame();
     }
 
     public static void drawFrame() throws InterruptedException {
-        JFrame frame = new JFrame();
-        GamePanel panel = new GamePanel();
-        frame.setContentPane(panel);
-        panel.setPreferredSize(new Dimension(FIELD_SIZE, FIELD_SIZE));
-        frame.pack();
-        frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        int tms = 20;
-        for (int i = 0; i < 20000; i++) {
-            field.nextGeneration();
-            panel.repaint();
+        SwingUtilities.invokeLater(() -> {
+            frame.setContentPane(panel);
+            panel.setPreferredSize(new Dimension(FIELD_SIZE, FIELD_SIZE));
+            frame.pack();
+            frame.setResizable(false);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+            frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    stopped = true;
+                }
+            });
+        });
+
+        int tms = 80;
+        while (!stopped) {
             Thread.sleep(tms);
+            SwingUtilities.invokeLater(() -> {
+                field.nextGeneration();
+                panel.repaint();
+            });
         }
+        SwingUtilities.invokeLater(frame::dispose);
+
     }
 
     public static class GamePanel extends JPanel {
