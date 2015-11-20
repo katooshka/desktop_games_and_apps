@@ -17,7 +17,7 @@ public class GameOfLife {
     private static final int CELL_COUNT = 100;
     private static final int FIELD_SIZE = CELL_SIZE * CELL_COUNT;
     private static final int CELLS_DENSITY_PERCENTAGE = 30;
-    private static final Color CELL_COLOR = new Color(86, 170, 138);
+    private static final Color CELL_COLOR = new Color(21, 109, 127);
     private static Field field = Field.createField(CELL_COUNT, CELLS_DENSITY_PERCENTAGE);
     private static volatile boolean stopped = false;
     private static JFrame frame = new JFrame();
